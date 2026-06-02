@@ -1,8 +1,16 @@
 import logging
 from motor.motor_asyncio import AsyncIOMotorClient
 from app.core.config import settings
+from bson import ObjectId
 
 logger = logging.getLogger("realty-service")
+
+def parse_id(id_str: str):
+    """Convert string ID to ObjectId if it is a valid 24-character hex, else return string."""
+    try:
+        return ObjectId(id_str)
+    except Exception:
+        return id_str
 
 class Database:
     client: AsyncIOMotorClient = None

@@ -27,7 +27,7 @@ class ProductCreate(ProductBase):
     pass
 
 class ProductResponse(ProductBase):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    id: Optional[PyObjectId] = Field(validation_alias="_id", serialization_alias="id", default=None)
 
     model_config = {
         "populate_by_name": True,

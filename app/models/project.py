@@ -21,7 +21,7 @@ class ProjectCreate(ProjectBase):
     pass
 
 class ProjectResponse(ProjectBase):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    id: Optional[PyObjectId] = Field(validation_alias="_id", serialization_alias="id", default=None)
 
     model_config = {
         "populate_by_name": True,

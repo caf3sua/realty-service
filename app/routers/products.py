@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List, Optional
-from app.core.database import get_db
+from app.core.database import get_db, parse_id
 from app.models.product import ProductResponse, ProductCreate
 
 router = APIRouter(prefix="/api/products", tags=["Products"])
@@ -30,15 +30,14 @@ async def get_products(
         products.append(document)
     return products
 
-@router.get("/{id}", response_model=ProductResponse)
-async def get_product_by_id(id: str, db=Depends(get_db)):
-    """Fetch a single product by its ID."""
-    # Attempt to find by string _id (since we seed mock IDs as strings)
-    product = await db["products"].find_one({"_id": id})
+@router.get("/{slug}", response_model=ProductResponse)
+async def get_product_by_slug(slug: str, db=Depends(get_db)):
+    """Fetch a single product by its slug."""
+    product = await db["products"].find_one({"slug": slug})
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Product with ID '{id}' not found"
+            detail=f"Product with slug '{slug}' not found"
         )
     return product
 
@@ -56,7 +55,7 @@ async def create_product(product: ProductCreate, db=Depends(get_db)):
 async def update_product(id: str, product: ProductCreate, db=Depends(get_db)):
     """Update an existing product."""
     product_dict = product.model_dump()
-    result = await db["products"].find_one_and_replace({"_id": id}, product_dict)
+    result = await db["products"].find_one_and_replace({"_id": parse_id(id)}, product_dict)
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -68,7 +67,7 @@ async def update_product(id: str, product: ProductCreate, db=Depends(get_db)):
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(id: str, db=Depends(get_db)):
     """Delete a product by its ID."""
-    result = await db["products"].delete_one({"_id": id})
+    result = await db["products"].delete_one({"_id": parse_id(id)})
     if result.deleted_count == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
