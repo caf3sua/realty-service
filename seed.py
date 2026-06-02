@@ -1,6 +1,11 @@
 import os
+import sys
 from pymongo import MongoClient
 from dotenv import load_dotenv
+
+# Ensure application path is included
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from app.core.security import hash_password
 
 # Load environment variables
 load_dotenv()
@@ -17,7 +22,7 @@ developers = [
     {
         "_id": "dev-1",
         "name": "Masterise Homes",
-        "logo": "/images/logo-Masterise-Homes.png",
+        "logo": "https://s3-hcmc02.higiocloud.vn/intranet/logos/0aabde5297104d3fb5988d5962f4106e.png",
         "title": "Phong Cách Sống Hàng Hiệu",
         "description": "Nhà phát triển bất động sản hàng hiệu hàng đầu Việt Nam, hợp tác cùng các đối tác toàn cầu như Elie Saab, Marriott International. Kiến tạo giá trị sống trường tồn và dịch vụ quản lý chất lượng thế giới.",
         "slug": "masterise-homes",
@@ -26,7 +31,7 @@ developers = [
     {
         "_id": "dev-2",
         "name": "MIK Group",
-        "logo": "/images/logo-MIK-Group.png",
+        "logo": "https://s3-hcmc02.higiocloud.vn/intranet/logos/1078c53f86aa4101adba8ebb6cf5ae80.png",
         "title": "Chuẩn Mực Sống Sang Trọng",
         "description": "Nổi tiếng với định vị dòng sản phẩm hạng sang The Matrix One và Imperia, MIK Group kiến tạo các giá trị sống bền vững, thiết kế xanh hài hòa thiên nhiên kết hợp công nghệ thông minh thời thượng.",
         "slug": "mik-group",
@@ -35,7 +40,7 @@ developers = [
     {
         "_id": "dev-3",
         "name": "Vinhomes",
-        "logo": "/images/logo-vinhomes.png",
+        "logo": "https://s3-hcmc02.higiocloud.vn/intranet/logos/814d34d8c44d417494d5eacd8bfda06c.png",
         "title": "Đại Đô Thị Biển Quốc Tế",
         "description": "Thương hiệu bất động sản số 1 Việt Nam, nổi bật với các siêu dự án đô thị sinh thái kết hợp biển hồ nhân tạo kỳ vĩ, quy hoạch đồng bộ \"Tất cả trong một\" kiến tạo chuẩn mực sống văn minh hiện đại hàng đầu.",
         "slug": "vinhomes",
@@ -44,7 +49,7 @@ developers = [
     {
         "_id": "dev-4",
         "name": "Sun Group",
-        "logo": "/images/logo-sun-group.png",
+        "logo": "https://s3-hcmc02.higiocloud.vn/intranet/logos/804933c49a964efe815b86b12d6ef9da.png",
         "title": "Kiệt Tác Nghỉ Dưỡng Độc Bản",
         "description": "Tập đoàn hàng đầu trong phát triển bất động sản gắn liền với du lịch nghỉ dưỡng cao cấp, shophouse phong cách nghệ thuật Địa Trung Hải và các dinh thiện biển tráng lệ hòa mình cùng thiên nhiên kỳ vĩ.",
         "slug": "sun-group",
@@ -61,8 +66,8 @@ projects = [
         "developer": "Vinhomes",
         "shortDescription": "Thành phố Biển hồ - Nơi mang biển xanh cát trắng vào lòng Hà Nội với hồ nước mặn nhân tạo rộng lớn.",
         "description": "Vinhomes Ocean Park 1 sở hữu đại tiện ích độc đáo gồm Biển hồ nước mặn 6,1ha và Hồ Ngọc Trai cát trắng 24,5ha. Dự án được quy hoạch đồng bộ mang tầm cỡ quốc tế, cung cấp đa dạng dòng sản phẩm từ căn hộ chung cư cao cấp đến các căn biệt thự, liền kề, shophouse đẳng cấp.",
-        "image": "/images/project-op1.png",
-        "banner": "/images/project-op1-banner.png",
+        "image": "https://s3-hcmc02.higiocloud.vn/intranet/logos/a0bbaaf456e241018de94bfdac6f5801.png",
+        "banner": "https://s3-hcmc02.higiocloud.vn/intranet/logos/a9319aca6c8e44168ba033da3ea78419.png",
         "status": "Đã bàn giao",
         "scale": "420 ha",
         "priceRange": "2.5 tỷ - 120 tỷ",
@@ -76,8 +81,8 @@ projects = [
         "developer": "Vinhomes",
         "shortDescription": "Kinh đô Ánh sáng - Siêu quần thể đô thị biển quy mô 1.000 ha với công viên sóng Royal Wave Park quy mô nhất.",
         "description": "Vinhomes Ocean Park 2 (The Empire) là giai đoạn 2 của siêu quần thể đô thị biển Vinhomes, nổi bật với Tổ hợp công viên Biển tạo sóng nhân tạo Royal Wave Park lớn nhất thế giới (18ha). Dự án bao gồm các phân khu mang phong cách kiến trúc đa dạng từ Pháp, Ý, Địa Trung Hải đến Đông Dương.",
-        "image": "/images/project-op2.png",
-        "banner": "/images/project-op2-banner.png",
+        "image": "https://s3-hcmc02.higiocloud.vn/intranet/logos/a8c4310ea0cc4c808edf7bcd0ef436cd.png",
+        "banner": "https://s3-hcmc02.higiocloud.vn/intranet/logos/98645964f3d845d994b72096a0f37af8.png",
         "status": "Đang mở bán",
         "scale": "458 ha",
         "priceRange": "6 tỷ - 150 tỷ",
@@ -91,8 +96,8 @@ projects = [
         "developer": "Vinhomes",
         "shortDescription": "Đại đô thị sinh thái thông minh, vịnh biển kỳ quan của tương lai với quy mô hơn 4.100 ha.",
         "description": "Vinhomes Hạ Long Xanh là siêu dự án phức hợp mang tính biểu tượng tại Quảng Ninh. Tọa lạc tại vị trí vàng kết nối trực tiếp cao tốc Hải Phòng - Hạ Long, dự án tích hợp hệ sinh thái nghỉ dưỡng, sân golf 18 lỗ, công viên chủ đề Safari, bến du thuyền quốc tế và các khu đô thị sinh thái hiện đại bậc nhất châu Á.",
-        "image": "/images/project-hlx.png",
-        "banner": "/images/project-hlx-banner.png",
+        "image": "https://s3-hcmc02.higiocloud.vn/intranet/logos/d97a42ce702747d4accfe16f57efbb68.png",
+        "banner": "https://s3-hcmc02.higiocloud.vn/intranet/logos/aa3fb90a60004e9fb4f5d45f13cec943.png",
         "status": "Sắp mở bán",
         "scale": "4.109 ha",
         "priceRange": "Liên hệ",
@@ -106,8 +111,8 @@ projects = [
         "developer": "Masterise Homes",
         "shortDescription": "Căn hộ wellness cao cấp chuẩn quốc tế tọa lạc tại trung tâm đại đô thị thông minh Smart City.",
         "description": "Masteri West Heights kiến tạo một không gian sống chuẩn wellness đẳng cấp quốc tế tại trung tâm Smart City Hà Nội. Với 4 tòa căn hộ cao cấp sở hữu tầm nhìn trực diện ra hồ trung tâm 4.8ha, dự án mang lại chuỗi 22 tiện ích đặc quyền trong nhà và ngoài trời cực kỳ xa hoa.",
-        "image": "/images/project-masteri.png",
-        "banner": "/images/project-masteri-banner.png",
+        "image": "https://s3-hcmc02.higiocloud.vn/intranet/logos/5a2cd415f546462a8199fb69a7725896.png",
+        "banner": "https://s3-hcmc02.higiocloud.vn/intranet/logos/b38e360f491e4e99a902ea07de0cd8c0.png",
         "status": "Đang mở bán",
         "scale": "2.1 ha",
         "priceRange": "3.2 tỷ - 9.5 tỷ",
@@ -121,12 +126,12 @@ projects = [
         "developer": "MIK Group",
         "shortDescription": "Tổ hợp căn hộ hạng sang, biểu tượng sống mới tại trung tâm kinh tế - hành chính Mỹ Đình.",
         "description": "The Matrix One là tổ hợp căn hộ siêu sang do MIK Group phát triển. Dự án nằm tại ngã tư Lê Quang Đạo - Mễ Trì, sở hữu tầm nhìn panorama triệu đô hướng ra công viên hồ điều hòa 14ha và đường đua F1 cũ. Dự án mang tiêu chuẩn bàn giao khắt khe nhất thế giới.",
-        "image": "/images/project-mik.png",
-        "banner": "/images/project-mik-banner.png",
+        "image": "https://s3-hcmc02.higiocloud.vn/intranet/logos/cca86fc2140141b2a287042d917a632e.png",
+        "banner": "https://s3-hcmc02.higiocloud.vn/intranet/logos/62f6a55f69eb48e089fd224c353540b7.png",
         "status": "Đã bàn giao",
         "scale": "39.8 ha (toàn khu)",
         "priceRange": "5.5 tỷ - 25 tỷ",
-        "tags": ["Căn hộ siêu sang", "Mỹ Đình", 'MIK Group', 'View công viên 14ha']
+        "tags": ["Căn hộ siêu sang", "Mỹ Đình", "MIK Group", "View công viên 14ha"]
     },
     {
         "_id": "proj-6",
@@ -136,8 +141,8 @@ projects = [
         "developer": "Sun Group",
         "shortDescription": "Thị trấn Địa Trung Hải phồn hoa - Biểu tượng kiến trúc nghệ thuật và nghỉ dưỡng đẳng cấp bên bờ Nam đảo ngọc.",
         "description": "Sun Premier Village Primavera sở hữu vị trí đắc địa tại ga đi cáp treo Hòn Thơm, Phú Quốc. Dự án tái hiện một thị trấn ven biển Địa Trung Hải rực rỡ sắc màu với những căn shophouse thoải dần về phía biển, các quảng trường nghệ thuật lớn và công trình biểu tượng Cầu Hôn (Kiss Bridge).",
-        "image": "/images/project-sun.png",
-        "banner": "/images/project-sun.png",
+        "image": "https://s3-hcmc02.higiocloud.vn/intranet/logos/a2ee00e28ab046a9afa3939e8ecf170b.png",
+        "banner": "https://s3-hcmc02.higiocloud.vn/intranet/logos/d192e062b72848b9993ed46a6f7b933f.png",
         "status": "Đã bàn giao",
         "scale": "39.3 ha",
         "priceRange": "18 tỷ - 85 tỷ",
@@ -151,8 +156,8 @@ products = [
         "title": "Biệt Thự Đơn Lập Ngọc Trai Siêu VIP - View Trực Diện Biển Hồ Ngọc Trai",
         "slug": "biet-thu-don-lap-ngoc-trai-view-bien-ho",
         "price": 95.0,
-        "pricePerSqm": 316.6,
-        "area": 300,
+        "pricePerSqm": 317.0,
+        "area": 300.0,
         "bedrooms": 5,
         "bathrooms": 6,
         "location": "Phân khu Ngọc Trai, Vinhomes Ocean Park 1",
@@ -162,7 +167,11 @@ products = [
         "productTypeName": "Biệt thự",
         "isPremium": True,
         "developer": "Vinhomes",
-        "images": ["/images/prop-villa-1.png", "/images/prop-villa-1-int.png", "/images/prop-villa-1-ext2.png"],
+        "images": [
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/f38b551758ef46dd80ad140a43aa90a5.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/2529cedb356b4a3384937562a13b27c7.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/1c89c4098a0d4dca9b6ce80577547093.png"
+        ],
         "status": "Còn hàng",
         "direction": "Đông Nam",
         "legal": "Sổ đỏ lâu dài"
@@ -172,8 +181,8 @@ products = [
         "title": "Biệt Thự Song Lập San Hô Kế Cận Công Viên Sóng Royal Wave Park",
         "slug": "biet-thu-song-lap-san-ho-gan-cong-vien-song",
         "price": 18.5,
-        "pricePerSqm": 123.3,
-        "area": 150,
+        "pricePerSqm": 123.0,
+        "area": 150.0,
         "bedrooms": 4,
         "bathrooms": 5,
         "location": "Phân khu San Hô, Vinhomes Ocean Park 2",
@@ -183,7 +192,11 @@ products = [
         "productTypeName": "Biệt thự",
         "isPremium": False,
         "developer": "Vinhomes",
-        "images": ["/images/prop-villa-2.png", "/images/prop-villa-2-int.png", "/images/prop-villa-2-ext2.png"],
+        "images": [
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/80c76327c91143549a64cf2b41674218.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/fdac8c22ea8b4f65a2768357a5b0a5fa.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/4e9da45141ed405f9894f5293b41541a.png"
+        ],
         "status": "Còn hàng",
         "direction": "Nam",
         "legal": "Hợp đồng mua bán"
@@ -193,18 +206,22 @@ products = [
         "title": "Căn Hộ Panorama Masteri West Heights - Tòa A View Trọn Hồ Trung Tâm",
         "slug": "can-ho-panorama-masteri-west-heights-toa-a",
         "price": 4.8,
-        "pricePerSqm": 68.5,
-        "area": 70,
+        "pricePerSqm": 69.0,
+        "area": 70.0,
         "bedrooms": 2,
         "bathrooms": 2,
         "location": "Tòa A Masteri West Heights, Smart City, Hà Nội",
         "description": "Căn hộ 2 phòng ngủ 2 WC đẳng cấp tại dự án Masteri West Heights. Căn hộ ở tầng cao trung bình, sở hữu tầm nhìn trực diện và không góc chết ra hồ điều hòa trung tâm 4.8ha. Bàn giao đầy đủ thiết bị nội thất liền tường cao cấp từ các thương hiệu Kohler, Hafele, Daikin. Chủ sở hữu được tận hưởng bể bơi vô cực trên tầng thượng tòa nhà.",
         "projectSlug": "masteri-west-heights",
         "productType": "apartment",
-        "productTypeName": "Căn hộ",
+        "productTypeName": "Căn hộ chung cư",
         "isPremium": True,
         "developer": "Masterise Homes",
-        "images": ["/images/prop-apartment-1.png", "/images/prop-apartment-1-int.png", "/images/prop-apartment-1-ext2.png"],
+        "images": [
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/fbd7dc8a8eac429e9bbca744a03a37b7.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/c23c8421fbd8483fab69c37e2ddb8181.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/9bf9e0d6d9f245debe70e786756e7916.png"
+        ],
         "status": "Còn hàng",
         "direction": "Đông Bắc",
         "legal": "Sổ đỏ lâu dài"
@@ -214,18 +231,22 @@ products = [
         "title": "Căn Hộ Dual-Key Cao Cấp The Matrix One Mỹ Đình - Ban Công Panorama",
         "slug": "can-ho-dual-key-the-matrix-one-my-dinh",
         "price": 9.2,
-        "pricePerSqm": 82.1,
-        "area": 112,
+        "pricePerSqm": 82.0,
+        "area": 112.0,
         "bedrooms": 3,
         "bathrooms": 3,
         "location": "Tòa B The Matrix One, Mỹ Đình, Hà Nội",
         "description": "Căn hộ Dual-Key độc đáo tại The Matrix One, vừa thích hợp để ở vừa có thể cho thuê tạo dòng tiền ổn định. Thiết kế chia làm 2 lối đi riêng biệt dẫn vào căn studio và căn hộ 2 phòng ngủ. Toàn bộ căn hộ sử dụng kính hộp Triple Low-E chạm sàn cao cấp nhất, ngắm trọn vẹn hồ điều hòa 14ha và công viên Mỹ Đình.",
         "projectSlug": "the-matrix-one",
         "productType": "apartment",
-        "productTypeName": "Căn hộ",
+        "productTypeName": "Căn hộ chung cư",
         "isPremium": True,
         "developer": "MIK Group",
-        "images": ["/images/prop-apartment-2.png", "/images/prop-apartment-2-int.png", "/images/prop-apartment-2-ext2.png"],
+        "images": [
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/f75cf866e6ba4deda74397da58d9fe44.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/6b137d30b1744912b080e7fef0f49558.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/7722a3d841a34c2e8ebe2ad2a34b6ba2.png"
+        ],
         "status": "Đã cọc",
         "direction": "Tây Nam",
         "legal": "Sổ đỏ lâu dài"
@@ -235,18 +256,22 @@ products = [
         "title": "Nhà Phố Liền Kề Sao Biển - Vừa Ở Vừa Kinh Doanh Đắc Địa",
         "slug": "nha-pho-lien-ke-sao-bien-vinhomes-ocean-park-2",
         "price": 12.5,
-        "pricePerSqm": 138.8,
-        "area": 90,
+        "pricePerSqm": 139.0,
+        "area": 90.0,
         "bedrooms": 4,
         "bathrooms": 5,
         "location": "Phân khu Sao Biển, Vinhomes Ocean Park 2",
-        "description": "Nhà phố liền kề / Shophouse phân khu Sao Biển tại Vinhomes Ocean Park 2. Trục đường giao thông chính thông thoáng, thuận tiện kinh doanh dịch vụ ăn uống, thời trang hoặc làm văn phòng đại diện. Thiết kế phong cách Pháp cổ sang trọng 5 tầng, mặt tiền 5m cực thoáng.",
+        "description": "Nhà phố liền kề / Shophouse phân khu Sao Biển tại Vinhomes Ocean Park 2. Trục đường giao thông chính thông thoáng, thuận tiện kinh doanh dịch vụ ăn uống, thời trang hoặc làm văn phòng đại diện. Thiết kế phong cách Pháp cổ sang trọng 5 tầng, mặt tiện 5m cực thoáng.",
         "projectSlug": "ocean-park-2",
         "productType": "townhouse",
-        "productTypeName": "Liền kề",
+        "productTypeName": "Nhà liền kề",
         "isPremium": False,
         "developer": "Vinhomes",
-        "images": ["/images/prop-townhouse-1.png", "/images/prop-townhouse-1-int.png", "/images/prop-townhouse-1-ext2.png"],
+        "images": [
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/5f4b57afe5ae410caa96bf97dcd7bb56.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/e368e674f46945b2a2b8686b2ca58f3c.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/df4cbb38033a446d9d18d5dace3b1bc1.png"
+        ],
         "status": "Còn hàng",
         "direction": "Đông Nam",
         "legal": "Sổ đỏ lâu dài"
@@ -256,8 +281,8 @@ products = [
         "title": "Nhà Thổ Cư 5 Tầng Phố Cổ Hà Nội - Gần Hồ Gươm, Tiện Kinh Doanh",
         "slug": "nha-tho-cu-5-tang-pho-co-ha-noi-gan-ho-guom",
         "price": 35.0,
-        "pricePerSqm": 583.3,
-        "area": 60,
+        "pricePerSqm": 583.0,
+        "area": 60.0,
         "bedrooms": 4,
         "bathrooms": 4,
         "location": "Phố Hàng Bè, Hoàn Kiếm, Hà Nội",
@@ -266,7 +291,11 @@ products = [
         "productType": "residential",
         "productTypeName": "Nhà thổ cư",
         "isPremium": False,
-        "images": ["/images/prop-townhouse-2.png", "/images/prop-townhouse-2-int.png", "/images/prop-townhouse-2-ext2.png"],
+        "images": [
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/93274790ab734ef3b6f27851882bb574.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/380fe2636f504e1e84f19ff389e21be9.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/c30a89b767484cddae9e2e1d5406ea48.png"
+        ],
         "status": "Còn hàng",
         "direction": "Tây",
         "legal": "Sổ đỏ lâu dài"
@@ -277,17 +306,21 @@ products = [
         "slug": "shophouse-cat-tuong-vinhomes-ha-long-xanh",
         "price": 15.0,
         "pricePerSqm": 125.0,
-        "area": 120,
+        "area": 120.0,
         "bedrooms": 4,
         "bathrooms": 5,
         "location": "Phân khu Cát Tường, Vinhomes Hạ Long Xanh, Quảng Ninh",
         "description": "Suất ngoại giao shophouse thương mại phân khu Cát Tường thuộc siêu dự án Vinhomes Hạ Long Xanh. Tọa lạc ngay trên mặt đại lộ kinh tế rộng 60m kết nối toàn khu. Thiết kế phong cách Địa Trung Hải rực rỡ sắc màu, lý tưởng để mở nhà hàng, cửa hàng lưu niệm hoặc văn phòng dịch vụ du lịch.",
         "projectSlug": "ha-long-xanh",
         "productType": "townhouse",
-        "productTypeName": "Liền kề",
+        "productTypeName": "Nhà liền kề",
         "isPremium": False,
         "developer": "Vinhomes",
-        "images": ["/images/prop-townhouse-1.png", "/images/prop-townhouse-1-int.png", "/images/prop-townhouse-1-ext2.png"],
+        "images": [
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/66cb5c86cb7f4bf5b21957a43aac2973.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/baed6456eac04207bc1640dfce21c140.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/1669c1ff4dcf4a66837c6ba24ec467d2.png"
+        ],
         "status": "Còn hàng",
         "direction": "Nam",
         "legal": "Hợp đồng mua bán"
@@ -298,7 +331,7 @@ products = [
         "slug": "dinh-thu-hoang-gia-mat-bien-ha-long-xanh",
         "price": 180.0,
         "pricePerSqm": 360.0,
-        "area": 500,
+        "area": 500.0,
         "bedrooms": 6,
         "bathrooms": 8,
         "location": "Phân khu Vịnh Hoàng Gia, Vinhomes Hạ Long Xanh, Quảng Ninh",
@@ -308,7 +341,11 @@ products = [
         "productTypeName": "Biệt thự",
         "isPremium": True,
         "developer": "Vinhomes",
-        "images": ["/images/ha-long-xanh-hero.png", "/images/prop-villa-1-int.png", "/images/prop-villa-1-ext2.png"],
+        "images": [
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/014c719c8e9b4457ad2aba1518049811.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/43575aabaec24e2180c7355ec771d7cf.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/2d09497a90d14707ac48cad081fc9395.png"
+        ],
         "status": "Còn hàng",
         "direction": "Đông Nam",
         "legal": "Sổ đỏ lâu dài"
@@ -318,8 +355,8 @@ products = [
         "title": "Biệt Thự Sun Premier Village Phú Quốc - Sát Biển Bãi Khem Tuyệt Mỹ",
         "slug": "biet-thu-sun-premier-village-phu-quoc",
         "price": 65.0,
-        "pricePerSqm": 216.6,
-        "area": 300,
+        "pricePerSqm": 217.0,
+        "area": 300.0,
         "bedrooms": 4,
         "bathrooms": 5,
         "location": "Mũi Ông Đội, An Thới, Phú Quốc",
@@ -329,10 +366,44 @@ products = [
         "productTypeName": "Biệt thự",
         "isPremium": True,
         "developer": "Sun Group",
-        "images": ["/images/prop-villa-sun.png", "/images/prop-villa-sun-int.png", "/images/prop-villa-sun-ext2.png"],
+        "images": [
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/46bd1d49542e40e2ae578e7e7d3d1d2a.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/bd780d5329cf40c2b478879abd121ff9.png",
+            "https://s3-hcmc02.higiocloud.vn/intranet/logos/bdda66b49c314b8898ee6d2daba0f38b.png"
+        ],
         "status": "Còn hàng",
         "direction": "Tây Nam",
         "legal": "Sổ đỏ lâu dài"
+    }
+]
+
+users = [
+    {
+        "_id": "user-1",
+        "name": "Nguyễn Văn Admin",
+        "email": "admin@realty.com",
+        "hashed_password": hash_password("admin123"),
+        "role": "admin",
+        "status": "active",
+        "createdAt": "2026-01-15"
+    },
+    {
+        "_id": "user-2",
+        "name": "Trần Thị Nhân Viên",
+        "email": "staff@realty.com",
+        "hashed_password": hash_password("staff123"),
+        "role": "staff",
+        "status": "active",
+        "createdAt": "2026-02-20"
+    },
+    {
+        "_id": "user-3",
+        "name": "Lê Văn Khóa",
+        "email": "locked@realty.com",
+        "hashed_password": hash_password("password123"),
+        "role": "staff",
+        "status": "inactive",
+        "createdAt": "2026-03-10"
     }
 ]
 
@@ -343,21 +414,28 @@ def seed_db():
 
     # Seed Developers
     print("Seeding developers...")
-    db["developers"].delete_many({})
-    db["developers"].insert_many(developers)
+    db["realty_developers"].delete_many({})
+    db["realty_developers"].insert_many(developers)
     print(f"Successfully seeded {len(developers)} developers.")
 
     # Seed Projects
     print("Seeding projects...")
-    db["projects"].delete_many({})
-    db["projects"].insert_many(projects)
+    db["realty_projects"].delete_many({})
+    db["realty_projects"].insert_many(projects)
     print(f"Successfully seeded {len(projects)} projects.")
 
     # Seed Products
     print("Seeding products...")
-    db["products"].delete_many({})
-    db["products"].insert_many(products)
+    db["realty_products"].delete_many({})
+    db["realty_products"].insert_many(products)
     print(f"Successfully seeded {len(products)} products.")
+
+    # Seed Users
+    print("Seeding users...")
+    db["realty_users"].drop()
+    db["realty_users"].create_index("email", unique=True)
+    db["realty_users"].insert_many(users)
+    print(f"Successfully seeded {len(users)} users.")
 
     print("\nDatabase seeding completed successfully!")
     client.close()

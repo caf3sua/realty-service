@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     S3_REGION: str = "hanoi"
     S3_VERIFY: bool = True
 
+    SECRET_KEY: str = "7ef5bfd6205ba8fcd0e0f865db26a117b8f972b9a101f30a9db58673a3c9e6c9"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
+
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env"),
         env_file_encoding="utf-8",

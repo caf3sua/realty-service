@@ -9,7 +9,7 @@ router = APIRouter(prefix="/api/developers", tags=["Developers"])
 async def get_developers(db=Depends(get_db)):
     """Fetch all developers from the database."""
     developers = []
-    cursor = db["developers"].find({})
+    cursor = db["realty_developers"].find({})
     async for document in cursor:
         developers.append(document)
     return developers
@@ -18,14 +18,14 @@ async def get_developers(db=Depends(get_db)):
 async def create_developer(developer: DeveloperCreate, db=Depends(get_db)):
     """Create a new developer."""
     dev_dict = developer.model_dump()
-    result = await db["developers"].insert_one(dev_dict)
+    result = await db["realty_developers"].insert_one(dev_dict)
     dev_dict["_id"] = result.inserted_id
     return dev_dict
 
 @router.get("/{slug}", response_model=DeveloperResponse)
 async def get_developer_by_slug(slug: str, db=Depends(get_db)):
     """Fetch a single developer by its slug."""
-    developer = await db["developers"].find_one({"slug": slug})
+    developer = await db["realty_developers"].find_one({"slug": slug})
     if not developer:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -37,7 +37,7 @@ async def get_developer_by_slug(slug: str, db=Depends(get_db)):
 async def update_developer(id: str, developer: DeveloperCreate, db=Depends(get_db)):
     """Update an existing developer."""
     dev_dict = developer.model_dump()
-    result = await db["developers"].find_one_and_replace({"_id": parse_id(id)}, dev_dict)
+    result = await db["realty_developers"].find_one_and_replace({"_id": parse_id(id)}, dev_dict)
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -49,7 +49,7 @@ async def update_developer(id: str, developer: DeveloperCreate, db=Depends(get_d
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_developer(id: str, db=Depends(get_db)):
     """Delete a developer by its ID."""
-    result = await db["developers"].delete_one({"_id": parse_id(id)})
+    result = await db["realty_developers"].delete_one({"_id": parse_id(id)})
     if result.deleted_count == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -1,0 +1,146 @@
+import hashlib
+import secrets
+import json
+import base64
+import hmac
+import time
+from typing import Optional, Dict
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from app.core.config import settings
+from app.core.database import get_db, parse_id
+
+# OAuth2 Scheme definition
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
+
+# --- Password Hashing (PBKDF2-SHA256) ---
+def hash_password(password: str) -> str:
+    """Hash a password using PBKDF2-SHA256 with 600,000 iterations and a random salt."""
+    salt = secrets.token_hex(16)
+    iterations = 600000
+    hash_bytes = hashlib.pbkdf2_hmac(
+        'sha256',
+        password.encode('utf-8'),
+        salt.encode('utf-8'),
+        iterations
+    )
+    hash_hex = hash_bytes.hex()
+    return f"pbkdf2:sha256:{iterations}${salt}${hash_hex}"
+
+def verify_password(password: str, hashed_password: str) -> bool:
+    """Verify a plain password against the stored PBKDF2-SHA256 hash."""
+    try:
+        parts = hashed_password.split('$')
+        if len(parts) != 3:
+            return False
+        algo_info, salt, hash_hex = parts
+        algo, subalgo, iterations_str = algo_info.split(':')
+        iterations = int(iterations_str)
+        
+        test_hash_bytes = hashlib.pbkdf2_hmac(
+            subalgo,
+            password.encode('utf-8'),
+            salt.encode('utf-8'),
+            iterations
+        )
+        return hmac.compare_digest(test_hash_bytes.hex(), hash_hex)
+    except Exception:
+        return False
+
+# --- HMAC-SHA256 Signed JSON Tokens (JWT Compliant) ---
+def base64url_encode(data: bytes) -> str:
+    return base64.urlsafe_b64encode(data).decode('utf-8').rstrip('=')
+
+def base64url_decode(data: str) -> bytes:
+    padding = '=' * (4 - len(data) % 4)
+    return base64.urlsafe_b64decode(data + padding)
+
+def create_access_token(data: dict, expires_delta_minutes: Optional[int] = None) -> str:
+    """Generate an HMAC-SHA256 signed JWT-like access token."""
+    payload = data.copy()
+    if expires_delta_minutes:
+        expire = int(time.time()) + (expires_delta_minutes * 60)
+    else:
+        expire = int(time.time()) + (settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60)
+    
+    payload['exp'] = expire
+    
+    # JWT Header
+    header = {"alg": "HS256", "typ": "JWT"}
+    
+    header_b64 = base64url_encode(json.dumps(header).encode('utf-8'))
+    payload_b64 = base64url_encode(json.dumps(payload).encode('utf-8'))
+    
+    # Signature
+    signature_input = f"{header_b64}.{payload_b64}".encode('utf-8')
+    key = settings.SECRET_KEY.encode('utf-8')
+    signature = hmac.new(key, signature_input, hashlib.sha256).digest()
+    signature_b64 = base64url_encode(signature)
+    
+    return f"{header_b64}.{payload_b64}.{signature_b64}"
+
+def verify_access_token(token: str) -> Optional[dict]:
+    """Verify the signature and expiration of an access token."""
+    try:
+        parts = token.split('.')
+        if len(parts) != 3:
+            return None
+        
+        header_b64, payload_b64, signature_b64 = parts
+        
+        # Verify signature
+        signature_input = f"{header_b64}.{payload_b64}".encode('utf-8')
+        key = settings.SECRET_KEY.encode('utf-8')
+        expected_signature = hmac.new(key, signature_input, hashlib.sha256).digest()
+        expected_signature_b64 = base64url_encode(expected_signature)
+        
+        if not hmac.compare_digest(signature_b64, expected_signature_b64):
+            return None
+        
+        # Decode payload
+        payload_bytes = base64url_decode(payload_b64)
+        payload = json.loads(payload_bytes.decode('utf-8'))
+        
+        # Check expiration
+        exp = payload.get('exp')
+        if exp and int(time.time()) > exp:
+            return None # Expired
+            
+        return payload
+    except Exception:
+        return None
+
+# --- FastAPI Authentication Dependencies ---
+async def get_current_user(token: Optional[str] = Depends(oauth2_scheme), db = Depends(get_db)):
+    """FastAPI dependency to retrieve the current logged-in user from the database."""
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
+    if not token:
+        raise credentials_exception
+        
+    payload = verify_access_token(token)
+    if payload is None:
+        raise credentials_exception
+        
+    email: str = payload.get("email")
+    if email is None:
+        raise credentials_exception
+        
+    user = await db["realty_users"].find_one({"email": email})
+    if user is None:
+        raise credentials_exception
+        
+    return user
+
+async def get_current_active_user(current_user: dict = Depends(get_current_user)):
+    """FastAPI dependency to retrieve the user and verify they are not locked/inactive."""
+    if current_user.get("status") != "active":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Tài khoản đã bị khóa hoặc ngừng hoạt động"
+        )
+    return current_user

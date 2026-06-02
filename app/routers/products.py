@@ -25,7 +25,7 @@ async def get_products(
         query["projectSlug"] = project_slug
 
     products = []
-    cursor = db["products"].find(query)
+    cursor = db["realty_products"].find(query)
     async for document in cursor:
         products.append(document)
     return products
@@ -33,7 +33,7 @@ async def get_products(
 @router.get("/{slug}", response_model=ProductResponse)
 async def get_product_by_slug(slug: str, db=Depends(get_db)):
     """Fetch a single product by its slug."""
-    product = await db["products"].find_one({"slug": slug})
+    product = await db["realty_products"].find_one({"slug": slug})
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -47,7 +47,7 @@ async def create_product(product: ProductCreate, db=Depends(get_db)):
     product_dict = product.model_dump()
     # If client passed an id, we can set it as MongoDB _id
     # Otherwise, it will be generated automatically
-    result = await db["products"].insert_one(product_dict)
+    result = await db["realty_products"].insert_one(product_dict)
     product_dict["_id"] = result.inserted_id
     return product_dict
 
@@ -55,7 +55,7 @@ async def create_product(product: ProductCreate, db=Depends(get_db)):
 async def update_product(id: str, product: ProductCreate, db=Depends(get_db)):
     """Update an existing product."""
     product_dict = product.model_dump()
-    result = await db["products"].find_one_and_replace({"_id": parse_id(id)}, product_dict)
+    result = await db["realty_products"].find_one_and_replace({"_id": parse_id(id)}, product_dict)
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -67,7 +67,7 @@ async def update_product(id: str, product: ProductCreate, db=Depends(get_db)):
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(id: str, db=Depends(get_db)):
     """Delete a product by its ID."""
-    result = await db["products"].delete_one({"_id": parse_id(id)})
+    result = await db["realty_products"].delete_one({"_id": parse_id(id)})
     if result.deleted_count == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
