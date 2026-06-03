@@ -8,3 +8,4 @@ pymongo>=4.6.2
 dnspython>=2.6.1
 boto3>=1.34.0
 python-multipart>=0.0.9
+certifi>=2024.2.2

@@ -380,8 +380,8 @@ products = [
 users = [
     {
         "_id": "user-1",
-        "name": "Nguyễn Văn Admin",
-        "email": "admin@realty.com",
+        "name": "Administrator",
+        "email": "hoainamtin2@gmail.com",
         "hashed_password": hash_password("admin123"),
         "role": "admin",
         "status": "active",
@@ -408,8 +408,9 @@ users = [
 ]
 
 def seed_db():
+    import certifi
     print(f"Connecting to database '{DB_NAME}'...")
-    client = MongoClient(MONGODB_URI)
+    client = MongoClient(MONGODB_URI, tlsCAFile=certifi.where())
     db = client[DB_NAME]
 
     # Seed Developers
