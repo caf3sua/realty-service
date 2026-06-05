@@ -407,6 +407,84 @@ users = [
     }
 ]
 
+crm_customers = [
+    {
+        "name": "Nguyễn Văn Hùng",
+        "code": "KH-0001",
+        "phone": "0987654321",
+        "classification": "Tiềm năng",
+        "address": "72 Nguyễn Trãi, Thanh Xuân, Hà Nội",
+        "email": "hung.nguyen@gmail.com",
+        "source": "Facebook",
+        "needs": "Tìm mua liền kề Ocean Park 2 khoảng 12 tỷ",
+        "note": "Khách thiện chí, đã đi xem thực tế 1 lần",
+        "createdAt": "2026-06-01T10:30:00+07:00"
+    },
+    {
+        "name": "Lê Thị Mai",
+        "code": "KH-0002",
+        "phone": "0912345678",
+        "classification": "Đầu tư",
+        "address": "Lê Lợi, Quận 1, TP. HCM",
+        "email": "mai.le@yahoo.com",
+        "source": "Giới thiệu",
+        "needs": "Căn hộ Masteri West Heights làm homestay",
+        "note": "Nhà đầu tư quen thuộc, tài chính sẵn sàng",
+        "createdAt": "2026-06-02T14:45:00+07:00"
+    },
+    {
+        "name": "Phạm Minh Tuấn",
+        "code": "KH-0003",
+        "phone": "0909998877",
+        "classification": "Đầu tư",
+        "address": "Vinhomes Riverside, Long Biên, Hà Nội",
+        "email": "tuan.pham@vip.com",
+        "source": "Website",
+        "needs": "Biệt thự đơn lập view biển hồ Ocean Park 1",
+        "note": "Khách tài chính cực mạnh, cần tư vấn phân khu Ngọc Trai",
+        "createdAt": "2026-06-03T09:15:00+07:00"
+    }
+]
+
+crm_advisories = [
+    {
+        "name": "Nguyễn Hoàng Nam",
+        "phone": "0977665544",
+        "details": "Tôi muốn đăng ký nhận bảng giá dự án Ocean Park 2 phân khu San Hô và chính sách chiết khấu mới nhất.",
+        "productSlug": "biet-thu-song-lap-san-ho-gan-cong-vien-song",
+        "productName": "Biệt Thự Song Lập San Hô Kế Cận Công Viên Sóng Royal Wave Park",
+        "status": "Mới",
+        "createdAt": "2026-06-04T11:20:00+07:00"
+    },
+    {
+        "name": "Hoàng Thu Trang",
+        "phone": "0933445566",
+        "details": "Cần tư vấn căn hộ 2 phòng ngủ view hồ dự án Masteri West Heights, tầng trung, Đông Nam.",
+        "productSlug": "can-ho-panorama-masteri-west-heights-toa-a",
+        "productName": "Căn Hộ Panorama Masteri West Heights - Tòa A View Trọn Hồ Trung Tâm",
+        "status": "Đã liên hệ",
+        "createdAt": "2026-06-04T16:00:00+07:00"
+    }
+]
+
+crm_newsletters = [
+    {
+        "email": "newsletter1@domain.com",
+        "createdAt": "2026-05-20T08:00:00+07:00",
+        "active": True
+    },
+    {
+        "email": "newsletter2@domain.com",
+        "createdAt": "2026-05-25T09:30:00+07:00",
+        "active": True
+    },
+    {
+        "email": "unsubscribed@domain.com",
+        "createdAt": "2026-06-01T15:22:00+07:00",
+        "active": False
+    }
+]
+
 def seed_db():
     import certifi
     print(f"Connecting to database '{DB_NAME}'...")
@@ -437,6 +515,26 @@ def seed_db():
     db["realty_users"].create_index("email", unique=True)
     db["realty_users"].insert_many(users)
     print(f"Successfully seeded {len(users)} users.")
+
+    # Seed CRM Customers
+    print("Seeding CRM customers...")
+    db["crm_customers"].delete_many({})
+    db["crm_customers"].create_index("code", unique=True)
+    db["crm_customers"].insert_many(crm_customers)
+    print(f"Successfully seeded {len(crm_customers)} CRM customers.")
+
+    # Seed CRM Advisories
+    print("Seeding CRM advisories...")
+    db["crm_advisories"].delete_many({})
+    db["crm_advisories"].insert_many(crm_advisories)
+    print(f"Successfully seeded {len(crm_advisories)} CRM advisories.")
+
+    # Seed CRM Newsletters
+    print("Seeding CRM newsletters...")
+    db["crm_newsletters"].delete_many({})
+    db["crm_newsletters"].create_index("email", unique=True)
+    db["crm_newsletters"].insert_many(crm_newsletters)
+    print(f"Successfully seeded {len(crm_newsletters)} CRM newsletters.")
 
     print("\nDatabase seeding completed successfully!")
     client.close()
