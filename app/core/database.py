@@ -20,9 +20,13 @@ db_instance = Database()
 
 async def connect_db():
     """Establish connection to MongoDB cluster."""
-    import certifi
     logger.info("Connecting to MongoDB...")
-    db_instance.client = AsyncIOMotorClient(settings.MONGODB_URI, tlsCAFile=certifi.where())
+    uri_lower = settings.MONGODB_URI.lower()
+    if "tls=true" in uri_lower or "ssl=true" in uri_lower:
+        import certifi
+        db_instance.client = AsyncIOMotorClient(settings.MONGODB_URI, tlsCAFile=certifi.where())
+    else:
+        db_instance.client = AsyncIOMotorClient(settings.MONGODB_URI)
     db_instance.db = db_instance.client[settings.DB_NAME]
     logger.info("Connected to MongoDB successfully!")
 
