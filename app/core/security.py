@@ -144,3 +144,52 @@ async def get_current_active_user(current_user: dict = Depends(get_current_user)
             detail="Tài khoản đã bị khóa hoặc ngừng hoạt động"
         )
     return current_user
+
+def verify_google_token(token: str) -> dict:
+    """Verify Google ID token against Google Tokeninfo endpoint."""
+    import urllib.request
+    import urllib.error
+    
+    if not settings.GOOGLE_CLIENT_ID:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Chưa cấu hình Google Client ID trên hệ thống backend."
+        )
+        
+    try:
+        url = f"https://oauth2.googleapis.com/tokeninfo?id_token={token}"
+        req = urllib.request.Request(url, method="GET")
+        with urllib.request.urlopen(req, timeout=5) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            
+            if "error" in data or "error_description" in data:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail=data.get("error_description", "Token Google không hợp lệ.")
+                )
+                
+            # Verify Audience (client ID)
+            aud = data.get("aud")
+            if aud != settings.GOOGLE_CLIENT_ID:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token Google không khớp Client ID hệ thống."
+                )
+                
+            return data
+    except urllib.error.HTTPError as e:
+        try:
+            error_data = json.loads(e.read().decode('utf-8'))
+            error_detail = error_data.get("error_description", "Xác thực Token Google thất bại.")
+        except Exception:
+            error_detail = "Xác thực Token Google thất bại."
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=error_detail
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Lỗi xác thực Google: {str(e)}"
+        )
+

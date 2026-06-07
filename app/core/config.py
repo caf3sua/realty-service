@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     DB_NAME: str = "anh_duong_land"
     PORT: int = 8000
     HOST: str = "0.0.0.0"
+    GOOGLE_CLIENT_ID: str = ""
 
     S3_ACCESS_KEY_ID: str = "GIHR155UABQHQYA016R2"
     S3_ACCESS_SECRET: str = "APdsXAfLur12i39lbPTQBbZDwsVu1WwNUCqDDAjQ"
