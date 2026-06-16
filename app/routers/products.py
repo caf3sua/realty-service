@@ -10,6 +10,7 @@ async def get_products(
     product_type: Optional[str] = None,
     developer: Optional[str] = None,
     is_premium: Optional[bool] = None,
+    is_hot: Optional[bool] = None,
     project_slug: Optional[str] = None,
     db=Depends(get_db)
 ):
@@ -21,6 +22,8 @@ async def get_products(
         query["developer"] = developer
     if is_premium is not None:
         query["isPremium"] = is_premium
+    if is_hot is not None:
+        query["isHot"] = is_hot
     if project_slug:
         query["projectSlug"] = project_slug
 

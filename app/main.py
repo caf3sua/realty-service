@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.core.database import connect_db, close_db
-from app.routers import products, projects, developers, upload, auth, users, crm, posts
+from app.routers import products, projects, developers, upload, auth, users, crm, posts, amenities
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -31,6 +31,7 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "http://localhost:5174",
         "http://127.0.0.1:5174",
+        "https://cms.anhduong-property.online",
     ],
     allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
@@ -47,6 +48,7 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(crm.router)
 app.include_router(posts.router)
+app.include_router(amenities.router)
 
 @app.get("/", tags=["Root"])
 async def root():

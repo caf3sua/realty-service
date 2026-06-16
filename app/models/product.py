@@ -17,11 +17,15 @@ class ProductBase(BaseModel):
     productType: Literal['villa', 'townhouse', 'apartment', 'residential', 'shophouse']
     productTypeName: str
     isPremium: bool
+    isHot: bool = False
     developer: Optional[str] = None
     images: List[str]
     status: Literal['Còn hàng', 'Đã cọc', 'Đã bán', 'Đang bán', 'Sắp mở bán']
     direction: str
     legal: str
+    handoverCondition: Optional[str] = None
+    paymentMethod: Optional[str] = None
+    amenities: Optional[List[dict]] = Field(default_factory=list)
 
 class ProductCreate(ProductBase):
     pass
