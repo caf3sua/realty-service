@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from app.core.database import get_db, parse_id
 from app.models.project import ProjectResponse, ProjectCreate
+from app.core.security import get_current_active_user
 
 router = APIRouter(prefix="/api/projects", tags=["Projects"])
 
@@ -26,7 +27,7 @@ async def get_project_by_slug(slug: str, db=Depends(get_db)):
     return project
 
 @router.post("", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED)
-async def create_project(project: ProjectCreate, db=Depends(get_db)):
+async def create_project(project: ProjectCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Create a new project."""
     project_dict = project.model_dump()
     result = await db["realty_projects"].insert_one(project_dict)
@@ -34,7 +35,7 @@ async def create_project(project: ProjectCreate, db=Depends(get_db)):
     return project_dict
 
 @router.put("/{id}", response_model=ProjectResponse)
-async def update_project(id: str, project: ProjectCreate, db=Depends(get_db)):
+async def update_project(id: str, project: ProjectCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Update an existing project by its ID."""
     project_dict = project.model_dump()
     result = await db["realty_projects"].find_one_and_replace({"_id": parse_id(id)}, project_dict)
@@ -47,7 +48,7 @@ async def update_project(id: str, project: ProjectCreate, db=Depends(get_db)):
     return project_dict
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_project(id: str, db=Depends(get_db)):
+async def delete_project(id: str, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Delete a project by its ID."""
     result = await db["realty_projects"].delete_one({"_id": parse_id(id)})
     if result.deleted_count == 0:

@@ -3,6 +3,7 @@ from typing import List, Optional
 from datetime import datetime
 from app.core.database import get_db, parse_id
 from app.models.amenity import AmenityResponse, AmenityCreate
+from app.core.security import get_current_active_user
 
 router = APIRouter(prefix="/api/amenities", tags=["Amenities"])
 
@@ -23,7 +24,7 @@ async def get_amenities(
     return amenities
 
 @router.post("", response_model=AmenityResponse, status_code=status.HTTP_201_CREATED)
-async def create_amenity(amenity: AmenityCreate, db=Depends(get_db)):
+async def create_amenity(amenity: AmenityCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Create a new amenity."""
     amenity_dict = amenity.model_dump()
     amenity_dict["created_at"] = datetime.utcnow()
@@ -34,7 +35,7 @@ async def create_amenity(amenity: AmenityCreate, db=Depends(get_db)):
     return amenity_dict
 
 @router.put("/{id}", response_model=AmenityResponse)
-async def update_amenity(id: str, amenity: AmenityCreate, db=Depends(get_db)):
+async def update_amenity(id: str, amenity: AmenityCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Update an existing amenity."""
     amenity_dict = amenity.model_dump()
     amenity_dict["updated_at"] = datetime.utcnow()
@@ -56,7 +57,7 @@ async def update_amenity(id: str, amenity: AmenityCreate, db=Depends(get_db)):
     return result
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_amenity(id: str, db=Depends(get_db)):
+async def delete_amenity(id: str, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Delete an amenity by its ID."""
     result = await db["realty_amenities"].delete_one({"_id": parse_id(id)})
     if result.deleted_count == 0:

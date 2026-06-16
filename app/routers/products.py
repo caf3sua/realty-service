@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List, Optional
 from app.core.database import get_db, parse_id
 from app.models.product import ProductResponse, ProductCreate
+from app.core.security import get_current_active_user
 
 router = APIRouter(prefix="/api/products", tags=["Products"])
 
@@ -45,7 +46,7 @@ async def get_product_by_slug(slug: str, db=Depends(get_db)):
     return product
 
 @router.post("", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
-async def create_product(product: ProductCreate, db=Depends(get_db)):
+async def create_product(product: ProductCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Create a new product."""
     product_dict = product.model_dump()
     # If client passed an id, we can set it as MongoDB _id
@@ -55,7 +56,7 @@ async def create_product(product: ProductCreate, db=Depends(get_db)):
     return product_dict
 
 @router.put("/{id}", response_model=ProductResponse)
-async def update_product(id: str, product: ProductCreate, db=Depends(get_db)):
+async def update_product(id: str, product: ProductCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Update an existing product."""
     product_dict = product.model_dump()
     result = await db["realty_products"].find_one_and_replace({"_id": parse_id(id)}, product_dict)
@@ -68,7 +69,7 @@ async def update_product(id: str, product: ProductCreate, db=Depends(get_db)):
     return product_dict
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_product(id: str, db=Depends(get_db)):
+async def delete_product(id: str, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Delete a product by its ID."""
     result = await db["realty_products"].delete_one({"_id": parse_id(id)})
     if result.deleted_count == 0:

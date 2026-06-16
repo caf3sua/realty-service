@@ -1,14 +1,15 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, HTTPException, status, Depends
 import boto3
 from botocore.exceptions import ClientError
 from app.core.config import settings
+from app.core.security import get_current_active_user
 import uuid
 import os
 
 router = APIRouter(prefix="/api/upload", tags=["Upload"])
 
 @router.post("")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(file: UploadFile = File(...), current_user: dict = Depends(get_current_active_user)):
     # Extract file extension and generate unique filename
     _, ext = os.path.splitext(file.filename or "")
     if not ext:

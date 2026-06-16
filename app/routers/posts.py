@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from app.core.database import get_db, parse_id
 from app.models.post import PostResponse, PostCreate
+from app.core.security import get_current_active_user
 
 router = APIRouter(prefix="/api/posts", tags=["Posts"])
 
@@ -49,7 +50,7 @@ async def get_post_by_slug(slug: str, db=Depends(get_db)):
     return post
 
 @router.post("", response_model=PostResponse, status_code=status.HTTP_201_CREATED)
-async def create_post(post: PostCreate, db=Depends(get_db)):
+async def create_post(post: PostCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Create a new post with generated unique slug."""
     post_dict = post.model_dump()
     
@@ -64,7 +65,7 @@ async def create_post(post: PostCreate, db=Depends(get_db)):
     return post_dict
 
 @router.put("/{id}", response_model=PostResponse)
-async def update_post(id: str, post: PostCreate, db=Depends(get_db)):
+async def update_post(id: str, post: PostCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Update an existing post."""
     post_dict = post.model_dump()
     # Note: For updates, we replace the document and preserve the slug passed by the client.
@@ -78,7 +79,7 @@ async def update_post(id: str, post: PostCreate, db=Depends(get_db)):
     return post_dict
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_post(id: str, db=Depends(get_db)):
+async def delete_post(id: str, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Delete a post by its ID."""
     result = await db["realty_posts"].delete_one({"_id": parse_id(id)})
     if result.deleted_count == 0:

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from app.core.database import get_db, parse_id
 from app.models.developer import DeveloperResponse, DeveloperCreate
+from app.core.security import get_current_active_user
 
 router = APIRouter(prefix="/api/developers", tags=["Developers"])
 
@@ -15,7 +16,7 @@ async def get_developers(db=Depends(get_db)):
     return developers
 
 @router.post("", response_model=DeveloperResponse, status_code=status.HTTP_201_CREATED)
-async def create_developer(developer: DeveloperCreate, db=Depends(get_db)):
+async def create_developer(developer: DeveloperCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Create a new developer."""
     dev_dict = developer.model_dump()
     result = await db["realty_developers"].insert_one(dev_dict)
@@ -34,7 +35,7 @@ async def get_developer_by_slug(slug: str, db=Depends(get_db)):
     return developer
 
 @router.put("/{id}", response_model=DeveloperResponse)
-async def update_developer(id: str, developer: DeveloperCreate, db=Depends(get_db)):
+async def update_developer(id: str, developer: DeveloperCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Update an existing developer."""
     dev_dict = developer.model_dump()
     result = await db["realty_developers"].find_one_and_replace({"_id": parse_id(id)}, dev_dict)
@@ -47,7 +48,7 @@ async def update_developer(id: str, developer: DeveloperCreate, db=Depends(get_d
     return dev_dict
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_developer(id: str, db=Depends(get_db)):
+async def delete_developer(id: str, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Delete a developer by its ID."""
     result = await db["realty_developers"].delete_one({"_id": parse_id(id)})
     if result.deleted_count == 0:
