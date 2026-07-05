@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.core.database import connect_db, close_db
-from app.routers import products, projects, developers, upload, auth, users, crm, posts, amenities
+from app.routers import products, projects, developers, upload, auth, users, crm, posts, amenities, zalo
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -49,6 +49,7 @@ app.include_router(users.router)
 app.include_router(crm.router)
 app.include_router(posts.router)
 app.include_router(amenities.router)
+app.include_router(zalo.router)
 
 @app.get("/", tags=["Root"])
 async def root():
