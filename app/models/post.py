@@ -10,7 +10,8 @@ class PostBase(BaseModel):
     summary: str
     content: str
     image: str
-    category: Literal['Thị trường', 'Quy hoạch', 'Cẩm nang', 'Dự án']
+    category: Literal['Thị trường', 'Quy hoạch', 'Cẩm nang', 'Dự án', 'Mua bán']
+    tags: list[str] = Field(default_factory=list)
     publishedAt: Optional[str] = None
 
 class PostCreate(PostBase):
