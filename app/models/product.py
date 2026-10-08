@@ -6,9 +6,10 @@ PyObjectId = Annotated[str, BeforeValidator(str)]
 class ProductBase(BaseModel):
     title: str
     slug: str
-    price: float
+    price: Optional[float] = 0.0
+    expectedPrice: Optional[str] = None
     pricePerSqm: Optional[float] = None
-    area: float
+    area: Optional[float] = 0.0
     bedrooms: int
     bathrooms: int
     location: str
@@ -26,6 +27,8 @@ class ProductBase(BaseModel):
     handoverCondition: Optional[str] = None
     paymentMethod: Optional[str] = None
     amenities: Optional[List[dict]] = Field(default_factory=list)
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
 
 class ProductCreate(ProductBase):
     pass

@@ -4,14 +4,21 @@ from typing import Annotated, Optional, Literal
 # Custom type to handle MongoDB ObjectIds as string representation in JSON output
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
+class PostAttachment(BaseModel):
+    name: str
+    url: str
+    size: Optional[int] = None
+    type: Optional[str] = None
+
 class PostBase(BaseModel):
     title: str
     slug: str
     summary: str
     content: str
     image: str
-    category: Literal['Thị trường', 'Quy hoạch', 'Cẩm nang', 'Dự án', 'Mua bán']
+    category: Literal['Thị trường', 'Quy hoạch', 'Cẩm nang', 'Dự án', 'Mua bán', 'Tin tức']
     tags: list[str] = Field(default_factory=list)
+    attachments: list[PostAttachment] = Field(default_factory=list)
     publishedAt: Optional[str] = None
 
 class PostCreate(PostBase):

@@ -57,8 +57,19 @@ async def create_post(post: PostCreate, db=Depends(get_db), current_user: dict =
     # Generate slug with random suffix to ensure uniqueness
     base_slug = post_dict.get("slug") or slugify(post_dict["title"])
     cleaned_base = slugify(base_slug)
-    suffix = generate_random_suffix()
-    post_dict["slug"] = f"{cleaned_base}-{suffix}"
+    
+    # Check if slug already has a random 5-character suffix at the end
+    if not re.search(r'-[a-z0-9]{5}$', cleaned_base):
+        suffix = generate_random_suffix(5)
+        post_dict["slug"] = f"{cleaned_base}-{suffix}"
+    else:
+        post_dict["slug"] = cleaned_base
+
+    # Ensure slug uniqueness in database in case of collision
+    existing = await db["realty_posts"].find_one({"slug": post_dict["slug"]})
+    if existing:
+        suffix = generate_random_suffix(5)
+        post_dict["slug"] = f"{post_dict['slug']}-{suffix}"
     
     result = await db["realty_posts"].insert_one(post_dict)
     post_dict["_id"] = result.inserted_id

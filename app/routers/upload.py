@@ -68,7 +68,12 @@ async def upload_file(file: UploadFile = File(...), current_user: dict = Depends
         endpoint = settings.S3_ENDPOINT.rstrip("/")
         file_url = f"{endpoint}/{settings.S3_BUCKET}/{s3_key}"
         
-        return {"url": file_url}
+        return {
+            "url": file_url,
+            "filename": file.filename or unique_filename,
+            "size": len(contents),
+            "content_type": content_type
+        }
         
     except ClientError as e:
         raise HTTPException(

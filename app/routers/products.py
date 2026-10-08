@@ -1,8 +1,11 @@
+import re
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List, Optional
 from app.core.database import get_db, parse_id
 from app.models.product import ProductResponse, ProductCreate
 from app.core.security import get_current_active_user
+from app.routers.posts import slugify, generate_random_suffix
 
 router = APIRouter(prefix="/api/products", tags=["Products"])
 
@@ -49,8 +52,27 @@ async def get_product_by_slug(slug: str, db=Depends(get_db)):
 async def create_product(product: ProductCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Create a new product."""
     product_dict = product.model_dump()
-    # If client passed an id, we can set it as MongoDB _id
-    # Otherwise, it will be generated automatically
+    # Generate slug with random suffix to ensure uniqueness
+    base_slug = product_dict.get("slug") or slugify(product_dict.get("title", ""))
+    cleaned_base = slugify(base_slug)
+    
+    # Check if slug already has a random 5-character suffix at the end
+    if not re.search(r'-[a-z0-9]{5}$', cleaned_base):
+        suffix = generate_random_suffix(5)
+        product_dict["slug"] = f"{cleaned_base}-{suffix}"
+    else:
+        product_dict["slug"] = cleaned_base
+
+    # Ensure slug uniqueness in database in case of collision
+    existing = await db["realty_products"].find_one({"slug": product_dict["slug"]})
+    if existing:
+        suffix = generate_random_suffix(5)
+        product_dict["slug"] = f"{product_dict['slug']}-{suffix}"
+
+    now_iso = datetime.now().isoformat()
+    product_dict["createdAt"] = now_iso
+    product_dict["updatedAt"] = now_iso
+
     result = await db["realty_products"].insert_one(product_dict)
     product_dict["_id"] = result.inserted_id
     return product_dict
@@ -59,6 +81,10 @@ async def create_product(product: ProductCreate, db=Depends(get_db), current_use
 async def update_product(id: str, product: ProductCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Update an existing product."""
     product_dict = product.model_dump()
+    product_dict["updatedAt"] = datetime.now().isoformat()
+    existing = await db["realty_products"].find_one({"_id": parse_id(id)})
+    if existing and existing.get("createdAt"):
+        product_dict["createdAt"] = existing.get("createdAt")
     result = await db["realty_products"].find_one_and_replace({"_id": parse_id(id)}, product_dict)
     if not result:
         raise HTTPException(
