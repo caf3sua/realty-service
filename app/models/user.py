@@ -9,6 +9,7 @@ class UserBase(BaseModel):
     role: Literal['admin', 'staff']
     status: Literal['active', 'inactive']
     createdAt: str
+    updatedAt: Optional[str] = None
 
 class UserCreate(UserBase):
     password: str
@@ -19,6 +20,7 @@ class UserUpdate(BaseModel):
     role: Optional[Literal['admin', 'staff']] = None
     status: Optional[Literal['active', 'inactive']] = None
     password: Optional[str] = None
+    updatedAt: Optional[str] = None
 
 class UserResponse(UserBase):
     id: Optional[PyObjectId] = Field(validation_alias="_id", serialization_alias="id", default=None)

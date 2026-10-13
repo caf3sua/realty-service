@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from app.core.database import get_db, parse_id
@@ -10,15 +11,19 @@ router = APIRouter(prefix="/api/developers", tags=["Developers"])
 async def get_developers(db=Depends(get_db)):
     """Fetch all developers from the database."""
     developers = []
-    cursor = db["realty_developers"].find({})
+    cursor = db["realty_developers"].find({}).sort([("updatedAt", -1), ("createdAt", -1)])
     async for document in cursor:
         developers.append(document)
+    developers.sort(key=lambda x: str(x.get("updatedAt") or x.get("createdAt") or ""), reverse=True)
     return developers
 
 @router.post("", response_model=DeveloperResponse, status_code=status.HTTP_201_CREATED)
 async def create_developer(developer: DeveloperCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Create a new developer."""
     dev_dict = developer.model_dump()
+    now_iso = datetime.now().isoformat()
+    dev_dict["createdAt"] = now_iso
+    dev_dict["updatedAt"] = now_iso
     result = await db["realty_developers"].insert_one(dev_dict)
     dev_dict["_id"] = result.inserted_id
     return dev_dict
@@ -38,6 +43,13 @@ async def get_developer_by_slug(slug: str, db=Depends(get_db)):
 async def update_developer(id: str, developer: DeveloperCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Update an existing developer."""
     dev_dict = developer.model_dump()
+    now_iso = datetime.now().isoformat()
+    dev_dict["updatedAt"] = now_iso
+    existing = await db["realty_developers"].find_one({"_id": parse_id(id)})
+    if existing and existing.get("createdAt"):
+        dev_dict["createdAt"] = existing.get("createdAt")
+    elif not dev_dict.get("createdAt"):
+        dev_dict["createdAt"] = now_iso
     result = await db["realty_developers"].find_one_and_replace({"_id": parse_id(id)}, dev_dict)
     if not result:
         raise HTTPException(

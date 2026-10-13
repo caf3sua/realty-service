@@ -18,9 +18,10 @@ async def get_amenities(
         query["product_type"] = product_type
 
     amenities = []
-    cursor = db["realty_amenities"].find(query).sort("created_at", -1)
+    cursor = db["realty_amenities"].find(query).sort([("updated_at", -1), ("created_at", -1)])
     async for document in cursor:
         amenities.append(document)
+    amenities.sort(key=lambda x: str(x.get("updated_at") or x.get("created_at") or ""), reverse=True)
     return amenities
 
 @router.post("", response_model=AmenityResponse, status_code=status.HTTP_201_CREATED)

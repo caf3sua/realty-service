@@ -44,9 +44,10 @@ async def get_customers(
         ]
 
     customers = []
-    cursor = db["crm_customers"].find(query).sort("createdAt", -1)
+    cursor = db["crm_customers"].find(query).sort([("updatedAt", -1), ("createdAt", -1)])
     async for document in cursor:
         customers.append(document)
+    customers.sort(key=lambda x: str(x.get("updatedAt") or x.get("createdAt") or ""), reverse=True)
     return customers
 
 
@@ -88,6 +89,7 @@ async def create_customer(
     
     if not customer_dict.get("createdAt"):
         customer_dict["createdAt"] = get_current_time_str()
+    customer_dict["updatedAt"] = customer_dict.get("createdAt")
 
     result = await db["crm_customers"].insert_one(customer_dict)
     customer_dict["_id"] = result.inserted_id
@@ -126,6 +128,7 @@ async def update_customer(
     
     # Keep the original createdAt
     customer_dict["createdAt"] = customer.get("createdAt", get_current_time_str())
+    customer_dict["updatedAt"] = get_current_time_str()
 
     await db["crm_customers"].replace_one({"_id": target_id}, customer_dict)
     customer_dict["_id"] = target_id
@@ -172,9 +175,10 @@ async def get_advisories(
         ]
 
     advisories = []
-    cursor = db["crm_advisories"].find(query).sort("createdAt", -1)
+    cursor = db["crm_advisories"].find(query).sort([("updatedAt", -1), ("createdAt", -1)])
     async for document in cursor:
         advisories.append(document)
+    advisories.sort(key=lambda x: str(x.get("updatedAt") or x.get("createdAt") or ""), reverse=True)
     return advisories
 
 
@@ -203,6 +207,7 @@ async def create_advisory(
     advisory_dict = advisory_in.model_dump()
     if not advisory_dict.get("createdAt"):
         advisory_dict["createdAt"] = get_current_time_str()
+    advisory_dict["updatedAt"] = advisory_dict.get("createdAt")
     if not advisory_dict.get("status"):
         advisory_dict["status"] = "Mới"
 
@@ -227,12 +232,14 @@ async def update_advisory_status(
             detail=f"Không tìm thấy yêu cầu tư vấn với ID '{id}'"
         )
 
+    now_str = get_current_time_str()
     await db["crm_advisories"].update_one(
         {"_id": target_id},
-        {"$set": {"status": status_update}}
+        {"$set": {"status": status_update, "updatedAt": now_str}}
     )
     
     advisory["status"] = status_update
+    advisory["updatedAt"] = now_str
     return advisory
 
 
@@ -268,9 +275,10 @@ async def get_newsletters(
         query["active"] = active
 
     newsletters = []
-    cursor = db["crm_newsletters"].find(query).sort("createdAt", -1)
+    cursor = db["crm_newsletters"].find(query).sort([("updatedAt", -1), ("createdAt", -1)])
     async for document in cursor:
         newsletters.append(document)
+    newsletters.sort(key=lambda x: str(x.get("updatedAt") or x.get("createdAt") or ""), reverse=True)
     return newsletters
 
 
@@ -327,12 +335,14 @@ async def toggle_newsletter_active(
             detail=f"Không tìm thấy đăng ký với ID '{id}'"
         )
 
+    now_str = get_current_time_str()
     await db["crm_newsletters"].update_one(
         {"_id": target_id},
-        {"$set": {"active": active}}
+        {"$set": {"active": active, "updatedAt": now_str}}
     )
     
     newsletter["active"] = active
+    newsletter["updatedAt"] = now_str
     return newsletter
 
 

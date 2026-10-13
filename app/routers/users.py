@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List, Optional
 from app.core.database import get_db, parse_id
@@ -18,9 +19,10 @@ async def get_users(
         query["role"] = role
         
     users = []
-    cursor = db["realty_users"].find(query)
+    cursor = db["realty_users"].find(query).sort([("updatedAt", -1), ("createdAt", -1)])
     async for document in cursor:
         users.append(document)
+    users.sort(key=lambda x: str(x.get("updatedAt") or x.get("createdAt") or ""), reverse=True)
     return users
 
 @router.get("/{id}", response_model=UserResponse)
@@ -58,6 +60,10 @@ async def create_user(
     password = user_dict.pop("password")
     user_dict["hashed_password"] = hash_password(password)
     user_dict["email"] = user_dict["email"].lower()
+    now_iso = datetime.now().isoformat()
+    if not user_dict.get("createdAt"):
+        user_dict["createdAt"] = now_iso
+    user_dict["updatedAt"] = now_iso
     
     result = await db["realty_users"].insert_one(user_dict)
     user_dict["_id"] = result.inserted_id
@@ -121,6 +127,7 @@ async def update_user(
             pass
             
     # Apply changes to MongoDB document
+    user_dict["updatedAt"] = datetime.now().isoformat()
     updated_fields = {**user, **user_dict}
     
     result = await db["realty_users"].find_one_and_replace({"_id": target_id}, updated_fields)

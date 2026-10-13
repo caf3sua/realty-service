@@ -16,6 +16,8 @@ class ProjectBase(BaseModel):
     scale: str
     priceRange: str
     tags: List[str]
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
 
 class ProjectCreate(ProjectBase):
     pass

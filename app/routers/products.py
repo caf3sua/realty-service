@@ -32,9 +32,10 @@ async def get_products(
         query["projectSlug"] = project_slug
 
     products = []
-    cursor = db["realty_products"].find(query)
+    cursor = db["realty_products"].find(query).sort([("updatedAt", -1), ("createdAt", -1)])
     async for document in cursor:
         products.append(document)
+    products.sort(key=lambda x: str(x.get("updatedAt") or x.get("createdAt") or ""), reverse=True)
     return products
 
 @router.get("/{slug}", response_model=ProductResponse)

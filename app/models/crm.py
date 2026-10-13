@@ -16,6 +16,7 @@ class CustomerBase(BaseModel):
     needs: Optional[str] = None
     note: Optional[str] = None
     createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
 
 class CustomerCreate(CustomerBase):
     pass
@@ -52,6 +53,7 @@ class AdvisoryBase(BaseModel):
     productName: Optional[str] = None
     status: str = "Mới"  # e.g. "Mới", "Đã liên hệ", "Đang xử lý", "Đóng"
     createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
 
 class AdvisoryCreate(AdvisoryBase):
     pass
@@ -80,6 +82,7 @@ class AdvisoryResponse(AdvisoryBase):
 class NewsletterBase(BaseModel):
     email: EmailStr
     createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
     active: bool = True
 
 class NewsletterCreate(NewsletterBase):

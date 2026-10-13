@@ -11,6 +11,8 @@ class DeveloperBase(BaseModel):
     description: str
     slug: str
     linkText: str
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
 
 class DeveloperCreate(DeveloperBase):
     pass

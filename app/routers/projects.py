@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from app.core.database import get_db, parse_id
@@ -10,9 +11,10 @@ router = APIRouter(prefix="/api/projects", tags=["Projects"])
 async def get_projects(db=Depends(get_db)):
     """Fetch all projects from the database."""
     projects = []
-    cursor = db["realty_projects"].find({})
+    cursor = db["realty_projects"].find({}).sort([("updatedAt", -1), ("createdAt", -1)])
     async for document in cursor:
         projects.append(document)
+    projects.sort(key=lambda x: str(x.get("updatedAt") or x.get("createdAt") or ""), reverse=True)
     return projects
 
 @router.get("/{slug}", response_model=ProjectResponse)
@@ -30,6 +32,9 @@ async def get_project_by_slug(slug: str, db=Depends(get_db)):
 async def create_project(project: ProjectCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Create a new project."""
     project_dict = project.model_dump()
+    now_iso = datetime.now().isoformat()
+    project_dict["createdAt"] = now_iso
+    project_dict["updatedAt"] = now_iso
     result = await db["realty_projects"].insert_one(project_dict)
     project_dict["_id"] = result.inserted_id
     return project_dict
@@ -38,6 +43,13 @@ async def create_project(project: ProjectCreate, db=Depends(get_db), current_use
 async def update_project(id: str, project: ProjectCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Update an existing project by its ID."""
     project_dict = project.model_dump()
+    now_iso = datetime.now().isoformat()
+    project_dict["updatedAt"] = now_iso
+    existing = await db["realty_projects"].find_one({"_id": parse_id(id)})
+    if existing and existing.get("createdAt"):
+        project_dict["createdAt"] = existing.get("createdAt")
+    elif not project_dict.get("createdAt"):
+        project_dict["createdAt"] = now_iso
     result = await db["realty_projects"].find_one_and_replace({"_id": parse_id(id)}, project_dict)
     if not result:
         raise HTTPException(

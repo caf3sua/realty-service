@@ -2,6 +2,7 @@ import random
 import string
 import re
 import unicodedata
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from app.core.database import get_db, parse_id
@@ -33,9 +34,10 @@ def generate_random_suffix(length: int = 5) -> str:
 async def get_posts(db=Depends(get_db)):
     """Fetch all posts from the database."""
     posts = []
-    cursor = db["realty_posts"].find({})
+    cursor = db["realty_posts"].find({}).sort([("updatedAt", -1), ("publishedAt", -1), ("createdAt", -1)])
     async for document in cursor:
         posts.append(document)
+    posts.sort(key=lambda x: str(x.get("updatedAt") or x.get("publishedAt") or x.get("createdAt") or ""), reverse=True)
     return posts
 
 @router.get("/{slug}", response_model=PostResponse)
@@ -70,6 +72,12 @@ async def create_post(post: PostCreate, db=Depends(get_db), current_user: dict =
     if existing:
         suffix = generate_random_suffix(5)
         post_dict["slug"] = f"{post_dict['slug']}-{suffix}"
+
+    now_iso = datetime.now().isoformat()
+    post_dict["createdAt"] = now_iso
+    post_dict["updatedAt"] = now_iso
+    if not post_dict.get("publishedAt"):
+        post_dict["publishedAt"] = datetime.now().strftime("%Y-%m-%d")
     
     result = await db["realty_posts"].insert_one(post_dict)
     post_dict["_id"] = result.inserted_id
@@ -79,6 +87,14 @@ async def create_post(post: PostCreate, db=Depends(get_db), current_user: dict =
 async def update_post(id: str, post: PostCreate, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     """Update an existing post."""
     post_dict = post.model_dump()
+    now_iso = datetime.now().isoformat()
+    post_dict["updatedAt"] = now_iso
+    existing = await db["realty_posts"].find_one({"_id": parse_id(id)})
+    if existing and existing.get("createdAt"):
+        post_dict["createdAt"] = existing.get("createdAt")
+    elif not post_dict.get("createdAt"):
+        post_dict["createdAt"] = (existing.get("publishedAt") if existing else None) or now_iso
+
     # Note: For updates, we replace the document and preserve the slug passed by the client.
     result = await db["realty_posts"].find_one_and_replace({"_id": parse_id(id)}, post_dict)
     if not result:

@@ -20,6 +20,8 @@ class PostBase(BaseModel):
     tags: list[str] = Field(default_factory=list)
     attachments: list[PostAttachment] = Field(default_factory=list)
     publishedAt: Optional[str] = None
+    createdAt: Optional[str] = None
+    updatedAt: Optional[str] = None
 
 class PostCreate(PostBase):
     pass
